@@ -24,6 +24,7 @@ from astropy.io import fits
 import astropy.units as u
 import lmfit
 import gstools
+import roi_preset_def
 
 # from suncasa.pyGSFIT import gsutils
 # from gsutils import ff_emission
@@ -334,7 +335,13 @@ class App(QMainWindow):
         roi_button_box.addWidget(QLabel("Max Freq (GHz)"))
         roi_button_box.addWidget(self.roi_freq_hibound_selector)
 
-
+        # ADD presets selection box
+        self.roi_selection_presets_widget = QComboBox()
+        self.roi_selection_presets_widget.addItems(
+            ["Presets","Img_Inte_ROIs"])
+        self.roi_selection_presets_widget.setCurrentIndex(0)
+        self.roi_selection_presets_widget.currentIndexChanged.connect(self.presets_selector)
+        roi_button_box.addWidget(self.roi_selection_presets_widget)
 
         roi_definition_group_box.addLayout(roi_button_box)
 
@@ -1066,6 +1073,20 @@ class App(QMainWindow):
             self.current_roi_idx = len(self.rois[self.roi_group_idx]) - 1
         self.update_pgspec()
         #print(self.current_roi_idx)
+
+    def presets_selector(self):
+        print("Seleting ROI(s) with preset: '{}'".format(self.roi_selection_presets_widget.currentText()))
+        #self.add_customized_roi = roi_preset_def.add_customized_roi
+        self.add_preset = roi_preset_def.add_preset_roi_selection(self, preset=self.roi_selection_presets_widget.currentText())
+        #self.add_customized_roi()
+        #self.ele_dist = self.ele_function_selector_widget.currentText()
+        #self.init_params()
+
+    def fit_method_selector(self):
+        print("Selected Fit Method is: {}".format(self.fit_method_selector_widget.currentText()))
+        self.fit_method = self.fit_method_selector_widget.currentText()
+        self.init_fit_kws()
+        self.update_fit_kws_widgets()
 
     def calc_roi_spec(self):
         #print('=================Update ROI SPEC===============')
